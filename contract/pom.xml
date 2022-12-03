@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>java-sdk-grpc-contract</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.19</version>
     <name>Tinkoff Invest API Java SDK - GRPC contracts</name>
     <packaging>jar</packaging>
 
