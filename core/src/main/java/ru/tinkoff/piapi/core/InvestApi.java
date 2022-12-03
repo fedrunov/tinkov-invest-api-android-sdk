@@ -8,8 +8,7 @@ import io.grpc.ForwardingClientCall;
 import io.grpc.ForwardingClientCallListener;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
-import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
-import io.grpc.netty.shaded.io.netty.channel.ChannelOption;
+import io.grpc.okhttp.OkHttpChannelBuilder;
 import io.grpc.stub.MetadataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Интерфейс API реальной торговли.
  * <p>
  * При использовании токена с правами только на чтение
- * вызов модифицирующих методов приводит к ошибке.
+ * вызов модифицирующих методов приводит к ошибке.mav
  */
 public class InvestApi {
 
@@ -229,18 +228,15 @@ public class InvestApi {
     var headers = new Metadata();
     addAuthHeader(headers, token);
     addAppNameHeader(headers, appName);
-    var connectionTimeout = Duration.parse(props.getProperty("ru.tinkoff.piapi.core.connection-timeout"));
+
     var requestTimeout = Duration.parse(props.getProperty("ru.tinkoff.piapi.core.request-timeout"));
-    return NettyChannelBuilder
+
+    return OkHttpChannelBuilder
       .forTarget(target)
       .intercept(
         new LoggingInterceptor(),
         MetadataUtils.newAttachHeadersInterceptor(headers),
         new TimeoutInterceptor(requestTimeout))
-      .withOption(
-        ChannelOption.CONNECT_TIMEOUT_MILLIS,
-        (int) connectionTimeout.toMillis()) // Намерено сужаем тип - предполагается,
-      // что таймаут имеет разумную величину.
       .useTransportSecurity()
       .keepAliveTimeout(60, TimeUnit.SECONDS)
       .build();
